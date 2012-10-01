@@ -2,16 +2,37 @@
 
 import cairo
 from gi.repository import Gtk, Gdk
+from gi.repository import Unity, GObject, Gtk, Notify, Gdk, Pango, GLib
+
+#TODO
+# HIGH IMPORTANCE
+# format time remaining
+# Window on top
+# Window uncloseable
+#
+# LOW IMPORTANCE
+# create timer class
+# Add tray icon
+# Add appindicator
+# Add unity indicator
 
 class FullScreenWindow(Gtk.Window):
-    def __init__(self):
+    work_time = 45*60
+    break_time = 5*60
+    long_break = 10*60
+    postpone_time = 1*60
     
+    text_style = '<span foreground="white" font="36">%text%</span>'
+    
+    def __init__(self):
         builder = Gtk.Builder()
         builder.add_from_file("good.glade")
 
         super(FullScreenWindow, self).__init__()
-        main_box = builder.add_objects_from_file("good.glade", ('main_box'))
+        builder.add_objects_from_file("good.glade", ('main_box', 'time_lbl'))
         main_box = builder.get_object('main_box')
+        self.time_lbl = builder.get_object('time_lbl')
+#        self.time_lbl.use_markup(True)
         
         handlers = {
             "postpone": self.postpone,
@@ -21,6 +42,7 @@ class FullScreenWindow(Gtk.Window):
 
         main_box.reparent(self)
         self.add(main_box)
+        self.time_lbl.set_property("use-markup", True)
 
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_border_width(30)
@@ -35,14 +57,16 @@ class FullScreenWindow(Gtk.Window):
         self.connect("draw", self.redraw)
         self.connect("delete-event", Gtk.main_quit)
         self.connect('key-press-event', self.draw_something)
-        
-
-        
         self.show_all()
+        
+        self.timer_boot()
+
+    # ================
+    # event callbacks
+    # ================
 
     def redraw(self, widget, cr):
         self.cr = cr
-#        print cr, self.cr
         self.cr.set_source_rgba(.1, .1, .1, 0.9)
         self.cr.set_operator(cairo.OPERATOR_SOURCE)
         self.cr.paint()
@@ -52,21 +76,60 @@ class FullScreenWindow(Gtk.Window):
         print ("\ndraw something")
         cr = self.cr
         self.queue_draw()
-#        print cr
         cr.set_source_rgba(1.0, .0, .0, 1.0)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
         cr.set_operator(cairo.OPERATOR_OVER)
 
-    def postpone(self, widget):
-        print "postpone"
+    # timer functions
+    # TODO create timer class
+    def timer_boot(self):
+        # TODO is this the most efficient and power-saving timer?
+        GObject.timeout_add(1000, self.tick)
+        self.start_work()
+    
+    def start_work(self, timeout=None):
+        if timeout is None:
+            timeout = self.work_time
+        self.time = "work"
         self.hide()
-        pass
+        self.set_timer(timeout)
+    
+    def start_break(self, timeout=None):
+        if timeout is None:
+            timeout = self.break_time
+        self.time = "break"
+        self.show()
+        #TODO make long break after 3 short ones
+        self.set_timer(timeout)
+
+    def tick(self):
+        if self.counter > 0:
+            if self.time == "break":
+                print self.text_style.replace("%text%", str(self.counter)+" ")
+                # TODO time formatting
+                self.time_lbl.set_label( self.text_style.replace("%text%", str(self.counter)) )
+            self.counter -= 1
+        else:
+#            self.time_lbl.set_label( self.text_style.replace("%text%", "Done") ) 
+            if self.time == "break":
+                self.start_work()
+            else:
+                self.start_break()
+        return True
+
+    def set_timer(self, timeout=2):
+        print "timeout in", timeout
+        self.counter = timeout
+
+    # button callbacks
+    def postpone(self, widget):
+        self.start_work(self.postpone_time)
 
     def skip(self, widget):
-        print "skip"
-#        self.hide()
-        pass
+        #TODO prevent ocassinally skipping with "are you sure?" dialog
+        self.start_work()
+
 
 if __name__ == "__main__":
     main_window = FullScreenWindow()
