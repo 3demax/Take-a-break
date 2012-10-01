@@ -60,7 +60,7 @@ class FullScreenWindow(Gtk.Window):
 
     def postpone(self, widget):
         print "postpone"
-#        self.hide()
+        self.hide()
         pass
 
     def skip(self, widget):

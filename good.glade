@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkImage" id="break_img">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-cancel</property>
-  </object>
   <object class="GtkWindow" id="glade_window">
     <property name="can_focus">False</property>
     <child>
@@ -21,7 +16,51 @@
             <property name="can_focus">False</property>
             <property name="vexpand">True</property>
             <child>
-              <placeholder/>
+              <object class="GtkAlignment" id="break_align">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">end</property>
+                <property name="vexpand">True</property>
+                <child>
+                  <object class="GtkBox" id="box1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">start</property>
+                    <child>
+                      <object class="GtkImage" id="image1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="pixel_size">45</property>
+                        <property name="icon_name">dialog-error</property>
+                        <property name="icon-size">3</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="break_lbl">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="valign">start</property>
+                        <property name="label" translatable="yes">&lt;span foreground="white" font="36.0" variant="smallcaps"&gt;Take a break&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                        <property name="justify">center</property>
+                        <property name="track_visited_links">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
             </child>
           </object>
           <packing>
@@ -31,24 +70,20 @@
           </packing>
         </child>
         <child>
-          <object class="GtkAlignment" id="break_align">
+          <object class="GtkAlignment" id="time_align">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
             <property name="vexpand">True</property>
             <child>
-              <object class="GtkLinkButton" id="break_lbl">
-                <property name="label" translatable="yes">Take a break</property>
-                <property name="use_action_appearance">False</property>
+              <object class="GtkLabel" id="time_lbl">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="has_tooltip">True</property>
+                <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">start</property>
-                <property name="use_action_appearance">False</property>
-                <property name="image">break_img</property>
-                <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
+                <property name="label" translatable="yes">&lt;span foreground="white" font="36"&gt;3:29&lt;/span&gt;</property>
+                <property name="use_markup">True</property>
+                <property name="track_visited_links">False</property>
               </object>
             </child>
           </object>
