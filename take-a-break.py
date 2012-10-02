@@ -6,7 +6,6 @@ from gi.repository import Unity, GObject, Gtk, Notify, Gdk, Pango, GLib
 
 #TODO
 # HIGH IMPORTANCE
-# format time remaining
 # Window on top
 # Window uncloseable
 #
@@ -81,6 +80,9 @@ class FullScreenWindow(Gtk.Window):
         cr.paint()
         cr.set_operator(cairo.OPERATOR_OVER)
 
+    def format_time(self, interval):
+        return "%d:%.2d" % (interval/60, interval%60)
+
     # timer functions
     # TODO create timer class
     def timer_boot(self):
@@ -106,12 +108,10 @@ class FullScreenWindow(Gtk.Window):
     def tick(self):
         if self.counter > 0:
             if self.time == "break":
-                print self.text_style.replace("%text%", str(self.counter)+" ")
-                # TODO time formatting
-                self.time_lbl.set_label( self.text_style.replace("%text%", str(self.counter)) )
+                time = str( self.format_time(self.counter) )
+                self.time_lbl.set_label( self.text_style.replace("%text%", time) )
             self.counter -= 1
         else:
-#            self.time_lbl.set_label( self.text_style.replace("%text%", "Done") ) 
             if self.time == "break":
                 self.start_work()
             else:
