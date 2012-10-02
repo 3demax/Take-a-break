@@ -8,8 +8,10 @@ import os
 try:
     import actmon
 except:
-    actmon = object()
-    actmon.get_idle_time = lambda x: 0
+    class FakeActmon():
+        def get_idle_time(self):
+            return 0
+    actmon = FakeActmon()
 
 #TODO
 # HIGH IMPORTANCE
