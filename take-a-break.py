@@ -12,7 +12,6 @@ except:
 
 #TODO
 # HIGH IMPORTANCE
-# Window on top
 # Window uncloseable
 #
 # LOW IMPORTANCE
@@ -34,11 +33,11 @@ class FullScreenWindow(Gtk.Window):
         builder = Gtk.Builder()
         builder.add_from_file("good.glade")
 
-        super(FullScreenWindow, self).__init__()
+
         builder.add_objects_from_file("good.glade", ('main_box', 'time_lbl'))
         main_box = builder.get_object('main_box')
         self.time_lbl = builder.get_object('time_lbl')
-#        self.time_lbl.use_markup(True)
+        self.time_lbl.set_property("use-markup", True)
         
         handlers = {
             "postpone": self.postpone,
@@ -46,13 +45,17 @@ class FullScreenWindow(Gtk.Window):
         }
         builder.connect_signals(handlers)
 
+        super(FullScreenWindow, self).__init__()
         main_box.reparent(self)
         self.add(main_box)
-        self.time_lbl.set_property("use-markup", True)
+        
 
         self.set_position(Gtk.WindowPosition.CENTER)
-        self.set_border_width(30)
+#        self.set_border_width(30)
+
         self.fullscreen()
+        self.set_keep_above(True)
+        
         self.screen = self.get_screen()
         self.visual = self.screen.get_rgba_visual()
         if self.visual != None and self.screen.is_composited():
@@ -62,6 +65,8 @@ class FullScreenWindow(Gtk.Window):
         self.set_app_paintable(True)
         self.connect("draw", self.redraw)
         self.connect("delete-event", Gtk.main_quit)
+        # TODO uncomment to make uncloseable
+#        self.connect("delete-event", lambda widget, event: True)
         self.connect('key-press-event', self.draw_something)
         self.show_all()
         
