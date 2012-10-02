@@ -33,7 +33,7 @@ class StatusIcon(Gtk.StatusIcon):
 
     def icon_click(self, data):
         print "tray icon clicked", data
-        main_window.start_break()
+#        main_window.start_break()
 
     def menu_open(self, icon, button, time):
         main_window.tray_menu.show_all()
