@@ -28,7 +28,7 @@
                     <property name="halign">center</property>
                     <property name="valign">start</property>
                     <child>
-                      <object class="GtkImage" id="image1">
+                      <object class="GtkImage" id="break_img">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="pixel_size">45</property>
@@ -169,6 +169,7 @@
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Take a break now</property>
         <property name="use_underline">True</property>
+        <signal name="activate" handler="menu_break" swapped="no"/>
       </object>
     </child>
     <child>
@@ -195,6 +196,7 @@
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Quit</property>
         <property name="use_underline">True</property>
+        <signal name="activate" handler="menu_quit" swapped="no"/>
       </object>
     </child>
   </object>

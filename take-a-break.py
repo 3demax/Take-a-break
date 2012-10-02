@@ -35,9 +35,11 @@ class StatusIcon(Gtk.StatusIcon):
         print "tray icon clicked", data
         main_window.start_break()
 
-    def menu_open(self, button, activate_time, data):
-        print "tray menu_open", button, activate_time, data
-#        main_window.tray_menu.popup(None, None, None, None, 1, activate_time)
+    def menu_open(self, icon, button, time):
+        main_window.tray_menu.show_all()
+        def pos(menu, icon):
+            return (Gtk.StatusIcon.position_menu(menu, icon))
+        main_window.tray_menu.popup(None, None, pos, self, button, time)
 
 
 class FullScreenWindow(Gtk.Window):
@@ -72,7 +74,9 @@ class FullScreenWindow(Gtk.Window):
 
         handlers = {
             "postpone": self.postpone,
-            "skip": self.skip
+            "skip": self.skip,
+            "menu_break": self.take_break,
+            "menu_quit": Gtk.main_quit,
         }
         builder.connect_signals(handlers)
 
@@ -148,12 +152,12 @@ class FullScreenWindow(Gtk.Window):
                 self.time_lbl.set_label( self.text_style.replace("%text%", time) )
             else:
                 status_icon.set_tooltip_text("Next break in %s" % (time))
-            
+                builder.get_object('time_remaining').set_label(time)
             if actmon.get_idle_time() > self.idle_time*1000 and self.time == "work":
                 self.timer_pause()
             else:
                 self.timer_play()
-            
+
             if self.timer_counting:
                 self.counter -= 1
         else:
@@ -174,13 +178,16 @@ class FullScreenWindow(Gtk.Window):
     def skip(self, widget):
         #TODO prevent ocassinally skipping with "are you sure?" dialog
         self.start_work()
+        
+    def take_break(self, widget):
+        self.start_break()
 
 
 if __name__ == "__main__":
     builder = Gtk.Builder()
-#    builder.add_from_file("good.glade")
     pth = os.path.dirname(os.path.realpath(__file__))
-    builder.add_objects_from_file(pth + "/good.glade", ('main_box', 'time_lbl', 'tray_menu', ''))
+    builder.add_from_file(pth + "/good.glade")
+    #builder.add_objects_from_file(pth + "/good.glade", ('main_box', 'time_lbl', 'tray_menu', ''))
 
     status_icon = StatusIcon()
     main_window = FullScreenWindow()
