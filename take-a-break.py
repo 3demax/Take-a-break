@@ -4,6 +4,12 @@ import cairo
 from gi.repository import Gtk, Gdk
 from gi.repository import Unity, GObject, Gtk, Notify, Gdk, Pango, GLib
 
+try:
+    import actmon
+except:
+    actmon = object()
+    actmon.get_idle_time = lambda x: 0
+
 #TODO
 # HIGH IMPORTANCE
 # Window on top
@@ -20,6 +26,7 @@ class FullScreenWindow(Gtk.Window):
     break_time = 5*60
     long_break = 10*60
     postpone_time = 1*60
+    idle_time = 1*60
     
     text_style = '<span foreground="white" font="36">%text%</span>'
     
@@ -88,6 +95,7 @@ class FullScreenWindow(Gtk.Window):
     def timer_boot(self):
         # TODO is this the most efficient and power-saving timer?
         GObject.timeout_add(1000, self.tick)
+        self.timer_play()
         self.start_work()
     
     def start_work(self, timeout=None):
@@ -105,12 +113,23 @@ class FullScreenWindow(Gtk.Window):
         #TODO make long break after 3 short ones
         self.set_timer(timeout)
 
+    def timer_pause(self):
+        self.timer_counting = False
+    
+    def timer_play(self):
+        self.timer_counting = True
+
     def tick(self):
         if self.counter > 0:
             if self.time == "break":
                 time = str( self.format_time(self.counter) )
                 self.time_lbl.set_label( self.text_style.replace("%text%", time) )
-            self.counter -= 1
+            if actmon.get_idle_time() > self.idle_time*1000:
+                self.timer_pause()
+            else:
+                self.timer_play()
+            if self.timer_counting:
+                self.counter -= 1
         else:
             if self.time == "break":
                 self.start_work()
