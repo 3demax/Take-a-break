@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import cairo
-from gi.repository import Gtk, Gdk
-from gi.repository import Unity, GObject, Gtk, Notify, Gdk, Pango, GLib
+#from gi.repository import Gtk, Gdk
+from gi.repository import Unity, GObject, Gtk, Notify, Gdk
+import os
 
 try:
     import actmon
@@ -20,56 +21,72 @@ except:
 # Add appindicator
 # Add unity indicator
 
+class StatusIcon(Gtk.StatusIcon):
+    def __init__(self):
+        super(StatusIcon, self).__init__()
+        self.set_tooltip_text("Take a break")
+        self.set_from_stock(Gtk.STOCK_CANCEL)
+        self.set_visible(True)
+
+        self.connect('activate', self.icon_click)
+        self.connect('popup-menu', self.menu_open)
+
+    def icon_click(self, data):
+        print "tray icon clicked", data
+        main_window.start_break()
+
+    def menu_open(self, button, activate_time, data):
+        print "tray menu_open", button, activate_time, data
+#        main_window.tray_menu.popup(None, None, None, None, 1, activate_time)
+
+
 class FullScreenWindow(Gtk.Window):
     work_time = 45*60
     break_time = 5*60
     long_break = 10*60
     postpone_time = 1*60
     idle_time = 1*60
-    
+
     text_style = '<span foreground="white" font="36">%text%</span>'
-    
+
     def __init__(self):
-        builder = Gtk.Builder()
-        builder.add_from_file("good.glade")
+        # main_window properties
+        super(FullScreenWindow, self).__init__()
+        self.set_position(Gtk.WindowPosition.CENTER)
+#        self.set_border_width(30)
+        self.fullscreen()
+        self.set_keep_above(True)
+        self.screen = self.get_screen()
+        self.visual = self.screen.get_rgba_visual()
+        if self.visual != None and self.screen.is_composited():
+            print "[INFO] Compositing enabled"
+            self.set_visual(self.visual)
+        self.set_app_paintable(True)
 
+        # main_box
+        self.tray_menu = builder.get_object('tray_menu')
 
-        builder.add_objects_from_file("good.glade", ('main_box', 'time_lbl'))
         main_box = builder.get_object('main_box')
         self.time_lbl = builder.get_object('time_lbl')
         self.time_lbl.set_property("use-markup", True)
-        
+
         handlers = {
             "postpone": self.postpone,
             "skip": self.skip
         }
         builder.connect_signals(handlers)
 
-        super(FullScreenWindow, self).__init__()
         main_box.reparent(self)
         self.add(main_box)
-        
 
-        self.set_position(Gtk.WindowPosition.CENTER)
-#        self.set_border_width(30)
-
-        self.fullscreen()
-        self.set_keep_above(True)
-        
-        self.screen = self.get_screen()
-        self.visual = self.screen.get_rgba_visual()
-        if self.visual != None and self.screen.is_composited():
-            print "[INFO] Compositing on"
-            self.set_visual(self.visual)
-
-        self.set_app_paintable(True)
+        # main_window events
         self.connect("draw", self.redraw)
         self.connect("delete-event", Gtk.main_quit)
         # TODO uncomment to make uncloseable
 #        self.connect("delete-event", lambda widget, event: True)
         self.connect('key-press-event', self.draw_something)
+
         self.show_all()
-        
         self.timer_boot()
 
     # ================
@@ -82,7 +99,7 @@ class FullScreenWindow(Gtk.Window):
         self.cr.set_operator(cairo.OPERATOR_SOURCE)
         self.cr.paint()
         self.cr.set_operator(cairo.OPERATOR_OVER)
-    
+
     def draw_something(self, widget, cr):
         print ("\ndraw something")
         cr = self.cr
@@ -102,14 +119,14 @@ class FullScreenWindow(Gtk.Window):
         GObject.timeout_add(1000, self.tick)
         self.timer_play()
         self.start_work()
-    
+
     def start_work(self, timeout=None):
         if timeout is None:
             timeout = self.work_time
         self.time = "work"
         self.hide()
         self.set_timer(timeout)
-    
+
     def start_break(self, timeout=None):
         if timeout is None:
             timeout = self.break_time
@@ -120,19 +137,23 @@ class FullScreenWindow(Gtk.Window):
 
     def timer_pause(self):
         self.timer_counting = False
-    
+
     def timer_play(self):
         self.timer_counting = True
 
     def tick(self):
         if self.counter > 0:
+            time = str( self.format_time(self.counter) )
             if self.time == "break":
-                time = str( self.format_time(self.counter) )
                 self.time_lbl.set_label( self.text_style.replace("%text%", time) )
-            if actmon.get_idle_time() > self.idle_time*1000:
+            else:
+                status_icon.set_tooltip_text("Next break in %s" % (time))
+            
+            if actmon.get_idle_time() > self.idle_time*1000 and self.time == "work":
                 self.timer_pause()
             else:
                 self.timer_play()
+            
             if self.timer_counting:
                 self.counter -= 1
         else:
@@ -156,6 +177,12 @@ class FullScreenWindow(Gtk.Window):
 
 
 if __name__ == "__main__":
+    builder = Gtk.Builder()
+#    builder.add_from_file("good.glade")
+    pth = os.path.dirname(os.path.realpath(__file__))
+    builder.add_objects_from_file(pth + "/good.glade", ('main_box', 'time_lbl', 'tray_menu', ''))
+
+    status_icon = StatusIcon()
     main_window = FullScreenWindow()
     Gtk.main()
 
