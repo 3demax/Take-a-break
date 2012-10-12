@@ -180,18 +180,34 @@ class FullScreenWindow(Gtk.Window):
     def skip(self, widget):
         #TODO prevent ocassinally skipping with "are you sure?" dialog
         self.start_work()
-        
+
     def take_break(self, widget):
         self.start_break()
 
 
+def main():
+        #TODO make application class based on Gtk.Application
+        data_directory = 'data/'
+        glade_file= 'good.glade'
+
+        global builder
+        builder = Gtk.Builder()
+        pth = os.path.dirname(os.path.realpath(__file__))
+
+        path = os.path.join(os.path.dirname(__file__),
+                            data_directory,
+                            glade_file)
+
+        builder.add_from_file(path)
+        #builder.add_objects_from_file(path + "/good.glade", ('main_box', 'time_lbl', 'tray_menu', ''))
+
+        global status_icon
+        status_icon = StatusIcon()
+
+        global main_window
+        main_window = FullScreenWindow()
+        Gtk.main()
+
+
 if __name__ == "__main__":
-    builder = Gtk.Builder()
-    pth = os.path.dirname(os.path.realpath(__file__))
-    builder.add_from_file(pth + "/good.glade")
-    #builder.add_objects_from_file(pth + "/good.glade", ('main_box', 'time_lbl', 'tray_menu', ''))
-
-    status_icon = StatusIcon()
-    main_window = FullScreenWindow()
-    Gtk.main()
-
+    main()

@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+
+import take_a_break
+take_a_break.main()
