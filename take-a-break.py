@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+DEBUG = False
+
 import cairo
 #from gi.repository import Gtk, Gdk
 from gi.repository import Unity, GObject, Gtk, Notify, Gdk
@@ -45,11 +47,18 @@ class StatusIcon(Gtk.StatusIcon):
 
 
 class FullScreenWindow(Gtk.Window):
-    work_time = 45*60
-    break_time = 5*60
-    long_break = 10*60
-    postpone_time = 1*60
-    idle_time = 1*60
+    if DEBUG:
+        work_time = 10
+        break_time = 6
+        long_break = 5
+        postpone_time = 2
+        idle_time = 5
+    else:
+        work_time = 45*60
+        break_time = 5*60
+        long_break = 10*60
+        postpone_time = 1*60
+        idle_time = 1*60
 
     text_style = '<span foreground="white" font="36">%text%</span>'
 
@@ -122,7 +131,7 @@ class FullScreenWindow(Gtk.Window):
     # TODO create timer class
     def timer_boot(self):
         # TODO is this the most efficient and power-saving timer?
-        GObject.timeout_add(1000, self.tick)
+        GObject.timeout_add_seconds(1, self.tick)
         self.timer_play()
         self.start_work()
 
