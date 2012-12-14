@@ -9,7 +9,7 @@ import os
 
 try:
     import actmon
-except:
+except ImportError:
     class FakeActmon():
         def get_idle_time(self):
             return 0
@@ -42,7 +42,7 @@ class StatusIcon(Gtk.StatusIcon):
     def menu_open(self, icon, button, time):
         main_window.tray_menu.show_all()
         def pos(menu, icon):
-            return (Gtk.StatusIcon.position_menu(menu, icon))
+            return Gtk.StatusIcon.position_menu(menu, icon)
         main_window.tray_menu.popup(None, None, pos, self, button, time)
 
 
@@ -57,7 +57,7 @@ class FullScreenWindow(Gtk.Window):
         work_time = 45*60
         break_time = 5*60
         long_break = 10*60
-        postpone_time = 1*60
+        postpone_time = 3*60
         idle_time = 1*60
 
     text_style = '<span foreground="white" font="36">%text%</span>'
@@ -80,6 +80,9 @@ class FullScreenWindow(Gtk.Window):
         self.tray_menu = builder.get_object('tray_menu')
 
         main_box = builder.get_object('main_box')
+        self.time_lbl = builder.get_object('time_lbl')
+        self.time_lbl.set_property("use-markup", True)
+
         self.time_lbl = builder.get_object('time_lbl')
         self.time_lbl.set_property("use-markup", True)
 
@@ -195,6 +198,14 @@ class FullScreenWindow(Gtk.Window):
 
 
 if __name__ == "__main__":
+#    screen = Gdk.Screen.get_default()
+#    css_provider = Gtk.CssProvider()
+#    css_provider.load_from_path('metro.css')
+#    
+#    context = Gtk.StyleContext()
+#    context.add_provider_for_screen(screen, css_provider,
+#                                     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
     builder = Gtk.Builder()
     pth = os.path.dirname(os.path.realpath(__file__))
     builder.add_from_file(pth + "/good.glade")
