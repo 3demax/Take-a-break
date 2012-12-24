@@ -1,0 +1,38 @@
+GtkButton {
+	engine: none;
+	background-color: #204a87;
+	background: #204a87;
+	color: white;
+	padding: 8px;
+	border-width: 0px;
+	border-style: none;
+	border-radius: 0;
+/*	margin: 0;
+	background-image: none;
+	-GtkWidget-focus-line-width: 0;
+	-GtkButton-child-displacement-y: 0;
+	-GtkButton-default-border: 0;
+	-GtkButton-image-spacing: 0;
+	-GtkButton-interior-focus: true;
+	-GtkButton-inner-border: 0;
+	*/
+}
+
+GtkButton.skip_btn {
+	engine: none;
+	background: #ce5c00;
+	color: white;
+	padding: 8px;
+	border-width: 0px;
+	border-style: none;
+	border-radius: 0;
+/*	margin: 0;
+	background-image: none;
+	-GtkWidget-focus-line-width: 0;
+	-GtkButton-child-displacement-y: 0;
+	-GtkButton-default-border: 0;
+	-GtkButton-image-spacing: 0;
+	-GtkButton-interior-focus: true;
+	-GtkButton-inner-border: 0;
+	*/
+}
