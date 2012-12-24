@@ -8,3 +8,8 @@ Screenshots
 -----------
 
 ![Pause screen](http://3demax.github.com/Take-a-break/screenshots/pause_screen_thumb.png)
+
+Usage
+-----
+
+	python take-a-break.py
